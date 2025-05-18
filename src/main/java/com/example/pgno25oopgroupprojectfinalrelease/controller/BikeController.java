@@ -25,12 +25,12 @@ public class BikeController {
         }
 
         if (user.isAdmin()) {
-            // Admin sees all bikes in a table format
+
             model.addAttribute("bikes", bikeService.getAllBikes());
             model.addAttribute("isAdmin", true);
             return "adminBikes";
         } else {
-            // Regular users see only available bikes in card format
+
             model.addAttribute("bikes", bikeService.getAllAvailableBikes());
             model.addAttribute("isAdmin", false);
             return "bikes";
@@ -100,7 +100,7 @@ public class BikeController {
             return "redirect:/bikes";
         }
 
-        // Ensure the ID in the path matches the ID in the form
+
         bike.setId(id);
         bikeService.updateBike(bike);
 
