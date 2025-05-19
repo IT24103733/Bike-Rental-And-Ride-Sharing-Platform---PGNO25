@@ -1,8 +1,8 @@
 package com.example.pgno25oopgroupprojectfinalrelease.controller;
 
-import com.example.oopprojectbeta.model.Feedback;
-import com.example.oopprojectbeta.model.User;
-import com.example.oopprojectbeta.service.FeedbackService;
+import com.example.pgno25oopgroupprojectfinalrelease.model.Feedback;
+import com.example.pgno25oopgroupprojectfinalrelease.model.User;
+import com.example.pgno25oopgroupprojectfinalrelease.service.FeedbackService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
