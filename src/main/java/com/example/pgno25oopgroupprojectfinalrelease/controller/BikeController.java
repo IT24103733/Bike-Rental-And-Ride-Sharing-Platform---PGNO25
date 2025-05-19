@@ -1,8 +1,8 @@
-package com.example.oopprojectbeta.controller;
+package com.example.pgno25oopgroupprojectfinalrelease.controller;
 
-import com.example.oopprojectbeta.model.Bike;
-import com.example.oopprojectbeta.model.User;
-import com.example.oopprojectbeta.service.BikeService;
+import com.example.pgno25oopgroupprojectfinalrelease.model.Bike;
+import com.example.pgno25oopgroupprojectfinalrelease.model.User;
+import com.example.pgno25oopgroupprojectfinalrelease.service.BikeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
