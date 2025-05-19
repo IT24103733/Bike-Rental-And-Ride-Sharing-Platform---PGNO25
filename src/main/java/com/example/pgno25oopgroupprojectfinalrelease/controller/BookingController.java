@@ -2,7 +2,7 @@ package com.example.pgno25oopgroupprojectfinalrelease.controller;
 
 
 
-import com.example.oopprojectbeta.model.Bike;
+import com.example.pgno25oopgroupprojectfinalrelease.model.Bike;
 import com.example.pgno25oopgroupprojectfinalrelease.model.Booking;
 import com.example.pgno25oopgroupprojectfinalrelease.model.User;
 import com.example.pgno25oopgroupprojectfinalrelease.service.BikeService;
