@@ -1,10 +1,10 @@
 package com.example.pgno25oopgroupprojectfinalrelease.controller;
 
-import com.example.oopprojectbeta.model.Bike;
-import com.example.oopprojectbeta.model.Maintenance;
-import com.example.oopprojectbeta.model.User;
-import com.example.oopprojectbeta.service.BikeService;
-import com.example.oopprojectbeta.service.MaintenanceService;
+import com.example.pgno25oopgroupprojectfinalrelease.model.Bike;
+import com.example.pgno25oopgroupprojectfinalrelease.model.Maintenance;
+import com.example.pgno25oopgroupprojectfinalrelease.model.User;
+import com.example.pgno25oopgroupprojectfinalrelease.service.BikeService;
+import com.example.pgno25oopgroupprojectfinalrelease.service.MaintenanceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
