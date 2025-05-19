@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Booking - Bike Rental</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="/bikes" class="nav-link">Request or Rent</a>
+            <a href="/bookings" class="nav-link active">My Bookings</a>
+            <a href="/rideshares" class="nav-link">Ride Sharing</a>
+            <a href="/feedback" class="nav-link">Feedback</a>
+            <a th:if="${session.user != null && session.user.admin}" href="/maintenance" class="nav-link">Maintenance</a>
+        </div>
+        <div class="nav-right">
+            <a href="/profile" class="nav-link">My Profile</a>
+            <a href="/logout" class="nav-link">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Update Booking</h1>
+
+        <div th:if="${param.error}" class="alert alert-danger">
+            An error occurred while updating your booking.
+        </div>
+
+        <form th:action="@{/bookings/update}" method="post" th:object="${booking}">
+            <input type="hidden" th:field="*{id}" />
+            <input type="hidden" th:field="*{userId}" />
+            <input type="hidden" th:field="*{bikeId}" />
+            <input type="hidden" th:field="*{bookingTime}" />
+            <input type="hidden" th:field="*{rideRequest}" />
+
+            <div class="booking-details">
+                <h3>Booking Information</h3>
+                <p><strong>Booking ID:</strong> <span th:text="*{id}">0</span></p>
+                <p><strong>Bike ID:</strong> <span th:text="*{bikeId}">0</span></p>
+                <p><strong>Booking Time:</strong> <span th:text="${#temporals.format(booking.bookingTime, 'yyyy-MM-dd HH:mm')}">2023-01-01 12:00</span></p>
+                <p th:if="*{rideRequest}">
+                    <strong>Type:</strong> Ride Request
+                </p>
+                <p th:unless="*{rideRequest}">
+                    <strong>Type:</strong> Bike Rental
+                </p>
+            </div>
+
+            <!-- Only show address field for ride requests -->
+            <div class="form-group" th:if="*{rideRequest}">
+                <label for="address">Delivery Address:</label>
+                <input type="text" id="address" th:field="*{address}" required>
+                <small class="form-text">Update the delivery address for your bike</small>
+            </div>
+
+            <!-- If it's a bike rental, show a message -->
+            <div class="form-group" th:unless="*{rideRequest}">
+                <p>For bike rentals, you can only cancel the booking. No updates are available.</p>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Update Booking</button>
+                <a href="/bookings" class="btn" style="background-color: #555;">Cancel</a>
+            </div>
+        </form>
+
+        <!-- If bike details are available, show them -->
+        <div class="bike-details" th:if="${bike != null}">
+            <h3>Bike Details</h3>
+            <p><strong>Name:</strong> <span th:text="${bike.name}">Bike Name</span></p>
+            <p><strong>Type:</strong> <span th:text="${bike.type}">Bike Type</span></p>
+            <p><strong>Price per hour:</strong> $<span th:text="${bike.pricePerHour}">0.00</span></p>
+        </div>
+    </div>
+
+    <footer>
+        <p>PGNO 25</p>
+    </footer>
+</body>
+</html>

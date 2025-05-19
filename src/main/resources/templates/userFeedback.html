@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Feedback</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="/bikes" class="nav-link">Request or Rent</a>
+            <a href="/bookings" class="nav-link">My Bookings</a>
+            <a href="/rideshares" class="nav-link">Ride Sharing</a>
+            <a href="/feedback" class="nav-link">All Feedback</a>
+            <a href="/feedback/user" class="nav-link active">My Feedback</a>
+            <a th:if="${isAdmin}" href="/maintenance" class="nav-link">Maintenance</a>
+        </div>
+        <div class="nav-right">
+            <a href="/profile" class="nav-link">My Profile</a>
+            <a href="/logout" class="nav-link">Logout</a>
+        </div>
+    </nav>
+
+    <main>
+        <section class="feedback-section">
+            <h2>My Feedback</h2>
+
+            <div class="feedback-form">
+                <h3>Add New Feedback</h3>
+                <form th:action="@{/feedback/add}" method="post" th:object="${newFeedback}">
+                    <div class="form-group">
+                        <label for="content">Your Feedback:</label>
+                        <textarea id="content" name="content" th:field="*{content}" rows="4" required></textarea>
+                    </div>
+                    <button type="submit" class="btn">Submit Feedback</button>
+                </form>
+            </div>
+
+            <div class="feedback-list">
+                <h3>Your Previous Feedback</h3>
+                <div th:if="${#lists.isEmpty(feedbacks)}" class="no-feedback">
+                    <p>You haven't submitted any feedback yet.</p>
+                </div>
+                <div th:each="feedback : ${feedbacks}" class="feedback-item" th:data-id="${feedback.id}">
+                    <div class="feedback-header">
+                        <span class="feedback-date" th:text="${#temporals.format(feedback.createdAt, 'dd-MM-yyyy HH:mm')}">Date</span>
+                        <div class="feedback-actions">
+                            <button class="edit-btn">Edit</button>
+                            <button class="delete-btn">Delete</button>
+                        </div>
+                    </div>
+                    <div class="feedback-content">
+                        <p th:text="${feedback.content}">Feedback content goes here.</p>
+                    </div>
+                    <div class="edit-form" style="display: none;">
+                        <textarea class="edit-content" th:text="${feedback.content}"></textarea>
+                        <div class="edit-actions">
+                            <button class="save-btn">Save</button>
+                            <button class="cancel-btn">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>PGNO 25</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Edit feedback
+            document.querySelectorAll('.edit-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const feedbackItem = this.closest('.feedback-item');
+                    feedbackItem.querySelector('.feedback-content').style.display = 'none';
+                    feedbackItem.querySelector('.edit-form').style.display = 'block';
+                    this.style.display = 'none';
+                });
+            });
+
+            // Cancel edit
+            document.querySelectorAll('.cancel-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const feedbackItem = this.closest('.feedback-item');
+                    feedbackItem.querySelector('.feedback-content').style.display = 'block';
+                    feedbackItem.querySelector('.edit-form').style.display = 'none';
+                    feedbackItem.querySelector('.edit-btn').style.display = 'inline-block';
+                });
+            });
+
+            // Save edited feedback
+            document.querySelectorAll('.save-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const feedbackItem = this.closest('.feedback-item');
+                    const feedbackId = feedbackItem.getAttribute('data-id');
+                    const content = feedbackItem.querySelector('.edit-content').value;
+
+                    fetch('/feedback/update', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            id: feedbackId,
+                            content: content
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            feedbackItem.querySelector('.feedback-content p').textContent = content;
+                            feedbackItem.querySelector('.feedback-content').style.display = 'block';
+                            feedbackItem.querySelector('.edit-form').style.display = 'none';
+                            feedbackItem.querySelector('.edit-btn').style.display = 'inline-block';
+                        } else {
+                            alert('Failed to update feedback: ' + data.error);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while updating feedback');
+                    });
+                });
+            });
+
+            // Delete feedback
+            document.querySelectorAll('.delete-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    if (confirm('Are you sure you want to delete this feedback?')) {
+                        const feedbackItem = this.closest('.feedback-item');
+                        const feedbackId = feedbackItem.getAttribute('data-id');
+
+                        fetch(`/feedback/${feedbackId}`, {
+                            method: 'DELETE'
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                feedbackItem.remove();
+                                if (document.querySelectorAll('.feedback-item').length === 0) {
+                                    document.querySelector('.feedback-list').innerHTML += '<div class="no-feedback"><p>You haven\'t submitted any feedback yet.</p></div>';
+                                }
+                            } else {
+                                alert('Failed to delete feedback: ' + data.error);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('An error occurred while deleting feedback');
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

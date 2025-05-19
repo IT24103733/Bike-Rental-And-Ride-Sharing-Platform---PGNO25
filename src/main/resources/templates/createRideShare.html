@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Ride Share - Bike Rental</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <style>
+        .ride-share-card {
+            background-color: #2a2a2a;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .ride-share-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .ride-share-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #333;
+        }
+
+        .ride-share-type {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        .ride-share-type.offer {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .ride-share-details {
+            margin-bottom: 15px;
+        }
+
+        .ride-share-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .spots-available {
+            font-weight: bold;
+            color: #4CAF50;
+        }
+
+        .no-spots {
+            font-weight: bold;
+            color: #f44336;
+        }
+
+        .no-ride-shares {
+            text-align: center;
+            padding: 30px;
+            background-color: #2a2a2a;
+            border-radius: 8px;
+            color: #999;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="/bikes" class="nav-link">Request or Rent</a>
+            <a href="/bookings" class="nav-link">My Bookings</a>
+            <a href="/rideshares" class="nav-link active">Ride Sharing</a>
+            <a href="/feedback" class="nav-link">Feedback</a>
+            <a th:if="${isAdmin}" href="/maintenance" class="nav-link">Maintenance</a>
+        </div>
+        <div class="nav-right">
+            <a href="/profile" class="nav-link">My Profile</a>
+            <a href="/logout" class="nav-link">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Create Ride Share</h1>
+
+        <form th:action="@{/rideshares/create}" method="post" th:object="${rideShare}" id="rideShareForm">
+            <div class="form-group">
+                <label for="offer">Type:</label>
+                <select id="offer" th:field="*{offer}" required>
+                    <option value="true">Offer a Ride</option>
+                    <option value="false">Request a Ride</option>
+                </select>
+            </div>
+
+            <div id="createRideSection">
+                <div class="form-group">
+                    <label for="landmark">Landmark/Location:</label>
+                    <input type="text" id="landmark" th:field="*{landmark}" required placeholder="Enter a landmark or location" />
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description:</label>
+                    <textarea id="description" th:field="*{description}" rows="4" required placeholder="Provide details about the ride"></textarea>
+                </div>
+
+                <div class="form-group ride-time">
+                    <label for="rideTime">Ride Time:</label>
+                    <input type="datetime-local" id="rideTime" th:field="*{rideTime}" required />
+                    <small class="form-text">When the ride is scheduled</small>
+                </div>
+
+                <div class="form-group capacity-group">
+                    <label for="capacity">Capacity (for offers):</label>
+                    <input type="number" id="capacity" th:field="*{capacity}" min="1" value="1" />
+                    <small class="form-text">Number of people that can join the ride</small>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Create Ride Share</button>
+                    <a href="/rideshares" class="btn" style="background-color: #555;">Cancel</a>
+                </div>
+            </div>
+        </form>
+
+        <!-- Available Rides Section (shown when requesting a ride) -->
+        <div id="availableRidesSection" style="display: none;">
+            <h2>Available Rides</h2>
+            <p>Here are the available rides that match your request. You can book one of these rides instead of creating a new request.</p>
+
+            <div th:if="${#lists.isEmpty(availableOffers)}" class="no-ride-shares">
+                <p>No ride offers available at the moment.</p>
+            </div>
+
+            <div th:each="offer : ${availableOffers}" class="ride-share-card">
+                <div class="ride-share-header">
+                    <div>
+                        <span class="ride-share-type offer">Offer</span>
+                        <span class="ride-share-author" th:text="${offer.username}">Username</span>
+                    </div>
+                    <span class="ride-share-date" th:text="${#temporals.format(offer.rideTime, 'dd-MM-yyyy HH:mm')}">Date</span>
+                </div>
+
+                <div class="ride-share-details">
+                    <p><strong>Landmark:</strong> <span th:text="${offer.landmark}">Landmark</span></p>
+                    <p><strong>Description:</strong> <span th:text="${offer.description}">Description</span></p>
+                    <p th:if="${offer.spotsAvailable > 0}" class="spots-available">
+                        <span th:text="${offer.spotsAvailable}">3</span> spots available out of 
+                        <span th:text="${offer.capacity}">4</span>
+                    </p>
+                    <p th:unless="${offer.spotsAvailable > 0}" class="no-spots">No spots available</p>
+                </div>
+
+                <div class="ride-share-actions">
+                    <button th:if="${offer.spotsAvailable > 0 && offer.userId != currentUserId}" 
+                            th:data-id="${offer.id}" 
+                            class="btn join-btn">Join This Ride</button>
+                </div>
+            </div>
+
+            <div class="form-actions" style="margin-top: 20px;">
+                <button id="showCreateRideBtn" class="btn btn-primary">Create New Request Instead</button>
+                <a href="/rideshares" class="btn" style="background-color: #555;">Cancel</a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>PGNO 25</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const offerSelect = document.getElementById('offer');
+            const capacityGroup = document.querySelector('.capacity-group');
+            const createRideSection = document.getElementById('createRideSection');
+            const availableRidesSection = document.getElementById('availableRidesSection');
+            const showCreateRideBtn = document.getElementById('showCreateRideBtn');
+            const form = document.getElementById('rideShareForm');
+
+            // Show/hide sections based on ride type
+            function toggleSections() {
+                if (offerSelect.value === 'true') {
+                    // For ride offers, show the create form and hide available rides
+                    capacityGroup.style.display = 'block';
+                    createRideSection.style.display = 'block';
+                    availableRidesSection.style.display = 'none';
+                } else {
+                    // For ride requests, hide capacity field and show available rides
+                    capacityGroup.style.display = 'none';
+
+                    // Show available rides section and hide create form
+                    createRideSection.style.display = 'none';
+                    availableRidesSection.style.display = 'block';
+                }
+            }
+
+            // Set initial state
+            toggleSections();
+
+            // Add event listener for changes to the offer select
+            offerSelect.addEventListener('change', toggleSections);
+
+            // Button to switch back to create ride form
+            showCreateRideBtn.addEventListener('click', function() {
+                createRideSection.style.display = 'block';
+                availableRidesSection.style.display = 'none';
+            });
+
+            // Set default ride time to 1 hour from now if not set
+            const rideTimeInput = document.getElementById('rideTime');
+            if (!rideTimeInput.value) {
+                const now = new Date();
+                now.setHours(now.getHours() + 1);
+
+                // Format date for datetime-local input
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+
+                rideTimeInput.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+            }
+
+            // Fix for form submission
+            form.addEventListener('submit', function(event) {
+                // Prevent default only if validation fails
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    return;
+                }
+
+                // Log form submission for debugging
+                console.log('Form submitted');
+
+                // Disable the submit button to prevent double submission
+                const submitButton = form.querySelector('button[type="submit"]');
+                submitButton.disabled = true;
+                submitButton.textContent = 'Creating...';
+            });
+
+            // Handle joining a ride
+            document.querySelectorAll('.join-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const rideShareId = this.getAttribute('data-id');
+
+                    // Disable the button to prevent multiple clicks
+                    this.disabled = true;
+                    this.textContent = 'Joining...';
+
+                    fetch(`/rideshares/join/${rideShareId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('You have successfully joined the ride!');
+                            window.location.href = '/rideshares';
+                        } else {
+                            alert('Failed to join ride: ' + data.error);
+                            this.disabled = false;
+                            this.textContent = 'Join This Ride';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while joining the ride');
+                        this.disabled = false;
+                        this.textContent = 'Join This Ride';
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bike Maintenance</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-left">
+            <th:block th:if="${isAdmin}">
+                <a href="/bikes" class="nav-link">Manage Bikes</a>
+                <a href="/bookings/admin" class="nav-link">Manage Bookings</a>
+                <a href="/admin/users" class="nav-link">Manage Users</a>
+                <a href="/rideshares" class="nav-link">Ride Sharing</a>
+                <a href="/feedback" class="nav-link">Feedback</a>
+                <a href="/maintenance" class="nav-link active">Maintenance</a>
+                <a href="/admin/analytics" class="nav-link">Analytics</a>
+            </th:block>
+            <th:block th:unless="${isAdmin}">
+                <a href="/bikes" class="nav-link">Request or Rent</a>
+                <a href="/bookings" class="nav-link">My Bookings</a>
+                <a href="/rideshares" class="nav-link">Ride Sharing</a>
+                <a href="/feedback" class="nav-link">Feedback</a>
+            </th:block>
+        </div>
+        <div class="nav-right">
+            <a href="/profile" class="nav-link">My Profile</a>
+            <a href="/logout" class="nav-link">Logout</a>
+        </div>
+    </nav>
+
+    <main>
+        <section class="maintenance-section">
+            <h2>Bike Maintenance Records</h2>
+
+            <div class="maintenance-form">
+                <h3>Add New Maintenance Record</h3>
+                <form th:action="@{/maintenance/add}" method="post" th:object="${newMaintenance}">
+                    <div class="form-group">
+                        <label for="bikeId">Bike:</label>
+                        <select id="bikeId" name="bikeId" th:field="*{bikeId}" required>
+                            <option value="">Select a bike</option>
+                            <option th:each="bike : ${bikes}" th:value="${bike.id}" th:text="${bike.name + ' (' + bike.type + ')'}">Bike Name</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Maintenance Description:</label>
+                        <textarea id="description" name="description" th:field="*{description}" rows="4" required></textarea>
+                    </div>
+                    <button type="submit" class="btn">Add Record</button>
+                </form>
+            </div>
+
+            <div class="maintenance-list">
+                <h3>All Maintenance Records</h3>
+                <div th:if="${#lists.isEmpty(maintenanceRecords)}" class="no-maintenance">
+                    <p>No maintenance records found.</p>
+                </div>
+                <div class="maintenance-filters">
+                    <input type="text" id="searchInput" placeholder="Search by bike name or description...">
+                    <button id="clearSearch" class="btn">Clear</button>
+                </div>
+                <table class="maintenance-table">
+                    <thead>
+                        <tr>
+                            <th>Bike</th>
+                            <th>Description</th>
+                            <th>Performed By</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="record : ${maintenanceRecords}" class="maintenance-item" th:data-id="${record.id}">
+                            <td th:text="${record.bikeName}">Bike Name</td>
+                            <td class="description-cell" th:text="${record.description}">Maintenance description</td>
+                            <td th:text="${record.adminUsername}">Admin</td>
+                            <td th:text="${#temporals.format(record.maintenanceDate, 'dd-MM-yyyy HH:mm')}">Date</td>
+                            <td class="actions-cell">
+                                <button class="edit-btn">Edit</button>
+                                <button class="delete-btn">Delete</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="edit-modal" style="display: none;">
+                    <div class="modal-content">
+                        <span class="close-modal">&times;</span>
+                        <h3>Edit Maintenance Record</h3>
+                        <div class="form-group">
+                            <label for="editDescription">Description:</label>
+                            <textarea id="editDescription" rows="4" required></textarea>
+                        </div>
+                        <button id="saveEdit" class="btn">Save Changes</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>PGNO 25</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.querySelector('.edit-modal');
+            const closeModal = document.querySelector('.close-modal');
+            let currentRecordId = null;
+
+            // Search functionality
+            const searchInput = document.getElementById('searchInput');
+            const clearSearch = document.getElementById('clearSearch');
+            const maintenanceItems = document.querySelectorAll('.maintenance-item');
+
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                maintenanceItems.forEach(item => {
+                    const bikeName = item.querySelector('td:first-child').textContent.toLowerCase();
+                    const description = item.querySelector('.description-cell').textContent.toLowerCase();
+                    if (bikeName.includes(searchTerm) || description.includes(searchTerm)) {
+                        item.style.display = '';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+
+            clearSearch.addEventListener('click', function() {
+                searchInput.value = '';
+                maintenanceItems.forEach(item => {
+                    item.style.display = '';
+                });
+            });
+
+            // Edit maintenance record
+            document.querySelectorAll('.edit-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const row = this.closest('tr');
+                    currentRecordId = row.getAttribute('data-id');
+                    const description = row.querySelector('.description-cell').textContent;
+
+                    document.getElementById('editDescription').value = description;
+                    modal.style.display = 'block';
+                });
+            });
+
+            // Close modal
+            closeModal.addEventListener('click', function() {
+                modal.style.display = 'none';
+            });
+
+            // Close modal when clicking outside
+            window.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+
+            // Save edited maintenance record
+            document.getElementById('saveEdit').addEventListener('click', function() {
+                const description = document.getElementById('editDescription').value;
+
+                fetch('/maintenance/update', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        id: currentRecordId,
+                        description: description
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update the row in the table
+                        const row = document.querySelector(`tr[data-id="${currentRecordId}"]`);
+                        row.querySelector('.description-cell').textContent = description;
+                        modal.style.display = 'none';
+                    } else {
+                        alert('Failed to update maintenance record: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while updating the maintenance record');
+                });
+            });
+
+            // Delete maintenance record
+            document.querySelectorAll('.delete-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    if (confirm('Are you sure you want to delete this maintenance record?')) {
+                        const row = this.closest('tr');
+                        const recordId = row.getAttribute('data-id');
+
+                        fetch(`/maintenance/${recordId}`, {
+                            method: 'DELETE'
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                row.remove();
+                                if (document.querySelectorAll('.maintenance-item').length === 0) {
+                                    document.querySelector('.maintenance-table').style.display = 'none';
+                                    document.querySelector('.maintenance-filters').style.display = 'none';
+                                    document.querySelector('.maintenance-list').innerHTML += '<div class="no-maintenance"><p>No maintenance records found.</p></div>';
+                                }
+                            } else {
+                                alert('Failed to delete maintenance record: ' + data.error);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('An error occurred while deleting the maintenance record');
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

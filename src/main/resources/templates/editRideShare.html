@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Ride Share - Bike Rental</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="/bikes" class="nav-link">Request or Rent</a>
+            <a href="/bookings" class="nav-link">My Bookings</a>
+            <a href="/rideshares" class="nav-link active">Ride Sharing</a>
+            <a href="/feedback" class="nav-link">Feedback</a>
+            <a th:if="${isAdmin}" href="/maintenance" class="nav-link">Maintenance</a>
+        </div>
+        <div class="nav-right">
+            <a href="/profile" class="nav-link">My Profile</a>
+            <a href="/logout" class="nav-link">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Edit Ride Share</h1>
+
+        <form th:action="@{/rideshares/edit/{id}(id=${rideShare.id})}" method="post" th:object="${rideShare}">
+            <input type="hidden" th:field="*{id}" />
+            <input type="hidden" th:field="*{userId}" />
+            <input type="hidden" th:field="*{username}" />
+            <input type="hidden" th:field="*{createdAt}" />
+
+            <div class="form-group">
+                <label for="offer">Type:</label>
+                <select id="offer" th:field="*{offer}" required>
+                    <option value="true">Offer a Ride</option>
+                    <option value="false">Request a Ride</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="landmark">Landmark/Location:</label>
+                <input type="text" id="landmark" th:field="*{landmark}" required placeholder="Enter a landmark or location" />
+            </div>
+
+            <div class="form-group">
+                <label for="description">Description:</label>
+                <textarea id="description" th:field="*{description}" rows="4" required placeholder="Provide details about the ride"></textarea>
+            </div>
+
+            <div class="form-group ride-time">
+                <label for="rideTime">Ride Time:</label>
+                <input type="datetime-local" id="rideTime" th:field="*{rideTime}" required />
+                <small class="form-text">When the ride is scheduled</small>
+            </div>
+
+            <div class="form-group capacity-group">
+                <label for="capacity">Capacity (for offers):</label>
+                <input type="number" id="capacity" th:field="*{capacity}" min="1" value="1" />
+                <small class="form-text">Number of people that can join the ride</small>
+            </div>
+
+            <div class="form-group spots-group" th:if="${rideShare.offer}">
+                <label for="spotsAvailable">Spots Available:</label>
+                <input type="number" id="spotsAvailable" th:field="*{spotsAvailable}" min="0" th:max="${rideShare.capacity}" />
+                <small class="form-text">Number of spots still available</small>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <a href="/rideshares/my" class="btn" style="background-color: #555;">Cancel</a>
+            </div>
+        </form>
+    </div>
+
+    <footer>
+        <p>PGNO 25</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const offerSelect = document.getElementById('offer');
+            const capacityGroup = document.querySelector('.capacity-group');
+            const spotsGroup = document.querySelector('.spots-group');
+            const capacityInput = document.getElementById('capacity');
+            const spotsInput = document.getElementById('spotsAvailable');
+
+            // Show/hide capacity and spots fields based on ride type
+            function toggleFields() {
+                if (offerSelect.value === 'true') {
+                    capacityGroup.style.display = 'block';
+                    if (spotsGroup) {
+                        spotsGroup.style.display = 'block';
+                    }
+                } else {
+                    capacityGroup.style.display = 'none';
+                    if (spotsGroup) {
+                        spotsGroup.style.display = 'none';
+                    }
+                }
+            }
+
+            // Set initial state
+            toggleFields();
+
+            // Add event listener for changes
+            offerSelect.addEventListener('change', toggleFields);
+
+            // Update max spots available when capacity changes
+            if (capacityInput && spotsInput) {
+                capacityInput.addEventListener('change', function() {
+                    spotsInput.max = capacityInput.value;
+                    if (parseInt(spotsInput.value) > parseInt(capacityInput.value)) {
+                        spotsInput.value = capacityInput.value;
+                    }
+                });
+            }
+
+            // Format datetime-local input
+            const rideTimeInput = document.getElementById('rideTime');
+            if (rideTimeInput.value) {
+                // Convert the datetime to the format expected by datetime-local input
+                const rideTime = new Date(rideTimeInput.value);
+                const year = rideTime.getFullYear();
+                const month = String(rideTime.getMonth() + 1).padStart(2, '0');
+                const day = String(rideTime.getDate()).padStart(2, '0');
+                const hours = String(rideTime.getHours()).padStart(2, '0');
+                const minutes = String(rideTime.getMinutes()).padStart(2, '0');
+
+                rideTimeInput.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+            }
+        });
+    </script>
+</body>
+</html>

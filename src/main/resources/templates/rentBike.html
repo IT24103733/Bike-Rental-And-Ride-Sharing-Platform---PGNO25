@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Rent a Bike</title>
+    <meta charset="UTF-8">
+    <!-- Add your CSS links here -->
+</head>
+<body>
+    <h1>Rent a Bike</h1>
+    <!-- Create your bike rental form here -->
+    <form th:action="@{/bookings/rent/{bikeId}(bikeId=${bike.id})}" method="post">
+        <!-- Form fields go here -->
+        <button type="submit">Rent Bike</button>
+    </form>
+</body>
+</html>
