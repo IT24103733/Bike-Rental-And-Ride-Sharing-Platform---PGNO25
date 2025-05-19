@@ -1,4 +1,4 @@
-package com.example.oopprojectbeta.model;
+package com.example.pgno25oopgroupprojectfinalrelease.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
