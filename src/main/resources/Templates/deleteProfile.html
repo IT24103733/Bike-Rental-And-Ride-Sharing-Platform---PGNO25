@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Account - Bike Rental</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="/bikes" class="nav-link">Request or Rent</a>
+            <a href="/bookings" class="nav-link">My Bookings</a>
+            <a href="/feedback" class="nav-link">Feedback</a>
+            <a th:if="${user.admin}" href="/maintenance" class="nav-link">Maintenance</a>
+            <a href="/profile" class="nav-link active">My Profile</a>
+        </div>
+        <div class="nav-right">
+            <a href="/logout" class="nav-link">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Delete Account</h1>
+
+        <div class="alert alert-danger">
+            <strong>Warning!</strong> This action cannot be undone. All your data, including bookings and feedback, will be permanently deleted.
+        </div>
+
+        <div class="delete-confirmation">
+            <h2>Are you sure you want to delete your account?</h2>
+            <p>Username: <strong th:text="${user.username}">Username</strong></p>
+            
+            <form th:action="@{/profile/delete}" method="post">
+                <input type="hidden" name="userId" th:value="${user.id}" />
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn" style="background-color: #f44336;">Yes, Delete My Account</button>
+                    <a href="/profile" class="btn">No, Keep My Account</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2023 Bike Rental System</p>
+    </footer>
+</body>
+</html>

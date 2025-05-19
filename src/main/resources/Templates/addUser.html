@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New User - Bike Rental</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="/bikes" class="nav-link">Manage Bikes</a>
+            <a href="/bookings/admin" class="nav-link">Manage Bookings</a>
+            <a href="/admin/users" class="nav-link active">Manage Users</a>
+            <a href="/feedback" class="nav-link">Feedback</a>
+            <a href="/maintenance" class="nav-link">Maintenance</a>
+        </div>
+        <div class="nav-right">
+            <a href="/profile" class="nav-link">My Profile</a>
+            <a href="/logout" class="nav-link">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Add New User</h1>
+
+        <form th:action="@{/admin/users/add}" method="post" th:object="${user}">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" th:field="*{username}" required />
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" th:field="*{password}" required />
+            </div>
+            
+            <div class="form-group">
+                <label for="address">Address:</label>
+                <input type="text" id="address" th:field="*{address}" required />
+            </div>
+            
+            <div class="form-group">
+                <label for="admin">Role:</label>
+                <select id="admin" th:field="*{admin}">
+                    <option value="false">Client</option>
+                    <option value="true">Administrator</option>
+                </select>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Create User</button>
+                <a href="/admin/users" class="btn" style="background-color: #555;">Cancel</a>
+            </div>
+        </form>
+    </div>
+
+    <footer>
+        <p>&copy; 2023 Bike Rental System</p>
+    </footer>
+</body>
+</html>
