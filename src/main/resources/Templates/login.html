@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login/Sign Up - Bike Rental</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+    <div class="container">
+        <h1>Bike Rental System</h1>
+
+        <div th:if="${param.registered}" class="alert alert-success">
+            Registration successful! Please login with your new account.
+        </div>
+
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+        <div class="tabs">
+            <div class="tab active" id="login-tab" onclick="switchTab('login')">Login</div>
+            <div class="tab" id="signup-tab" onclick="switchTab('signup')">Sign Up</div>
+        </div>
+
+        <div class="form-container">
+            <!-- Login Form -->
+            <div class="form-section active" id="login-section">
+                <form action="/login" method="post">
+                    <div class="form-group">
+                        <label for="login-username">Username:</label>
+                        <input type="text" id="login-username" name="username" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="login-password">Password:</label>
+                        <input type="password" id="login-password" name="password" required>
+                    </div>
+
+                    <button type="submit" class="btn">Login</button>
+                </form>
+            </div>
+
+            <!-- Signup Form -->
+            <div class="form-section" id="signup-section">
+                <form action="/signup" method="post">
+                    <div class="form-group">
+                        <label for="signup-username">Username:</label>
+                        <input type="text" id="signup-username" name="username" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="signup-password">Password:</label>
+                        <input type="password" id="signup-password" name="password" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="address">Address:</label>
+                        <input type="text" id="address" name="address" required>
+                    </div>
+
+                    <button type="submit" class="btn">Sign Up</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tab) {
+            // Hide all sections
+            document.querySelectorAll('.form-section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Deactivate all tabs
+            document.querySelectorAll('.tab').forEach(tabElement => {
+                tabElement.classList.remove('active');
+            });
+
+            // Activate selected tab and section
+            document.getElementById(tab + '-section').classList.add('active');
+            document.getElementById(tab + '-tab').classList.add('active');
+        }
+
+        // Check if URL has a parameter to switch to signup tab
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('showSignup')) {
+            switchTab('signup');
+        }
+    </script>
+</body>
+</html>
