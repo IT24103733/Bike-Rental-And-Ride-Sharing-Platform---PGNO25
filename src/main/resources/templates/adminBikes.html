@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Bikes Management - Bike Rental</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <style>
+        /* Additional styles for admin bike table */
+        .bike-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #2a2a2a;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .bike-table th, .bike-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #333;
+        }
+
+        .bike-table th {
+            background-color: #1a1a1a;
+            color: #4CAF50;
+            font-weight: 600;
+        }
+
+        .bike-table tr:hover {
+            background-color: #333;
+        }
+
+        .actions-cell {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Style for select elements */
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #333;
+            border-radius: 4px;
+            background-color: #2a2a2a;
+            color: #e0e0e0;
+            font-size: 16px;
+        }
+
+        .form-group select:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+        }
+
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #333;
+            border-radius: 4px;
+            background-color: #2a2a2a;
+            color: #e0e0e0;
+            font-size: 16px;
+            resize: vertical;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="/bikes" class="nav-link active">Manage Bikes</a>
+            <a href="/bookings/admin" class="nav-link">Manage Bookings</a>
+            <a href="/admin/users" class="nav-link">Manage Users</a>
+            <a href="/rideshares" class="nav-link">Ride Sharing</a>
+            <a href="/feedback" class="nav-link">Feedback</a>
+            <a href="/maintenance" class="nav-link">Maintenance</a>
+            <a href="/admin/analytics" class="nav-link">Analytics</a>
+        </div>
+        <div class="nav-right">
+            <a href="/profile" class="nav-link">My Profile</a>
+            <a href="/logout" class="nav-link">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Bike Management</h1>
+
+        <div th:if="${param.error}" class="alert alert-danger">
+            An error occurred while processing your request.
+        </div>
+
+        <!-- Admin-only section for adding new bikes -->
+        <div class="admin-section">
+            <a href="/bikes/add" class="btn btn-primary">Add New Bike</a>
+        </div>
+
+        <!-- Bike table -->
+        <div class="bike-list">
+            <div th:if="${#lists.isEmpty(bikes)}" class="no-bikes">
+                <p>No bikes available at the moment.</p>
+            </div>
+
+            <table class="bike-table" th:if="${not #lists.isEmpty(bikes)}">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Price per Hour</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="bike : ${bikes}">
+                        <td th:text="${bike.id}">1</td>
+                        <td th:text="${bike.name}">Bike Name</td>
+                        <td th:text="${bike.type}">Bike Type</td>
+                        <td>$<span th:text="${bike.pricePerHour}">0.00</span></td>
+                        <td th:text="${bike.available ? 'Available' : 'Not Available'}">Status</td>
+                        <td class="actions-cell">
+                            <a th:href="@{/bikes/edit/{id}(id=${bike.id})}" class="edit-btn">Edit</a>
+                            <a th:href="@{/bikes/delete/{id}(id=${bike.id})}" class="delete-btn" 
+                               onclick="return confirm('Are you sure you want to delete this bike?')">Delete</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

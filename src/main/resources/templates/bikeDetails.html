@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Bike Details</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+    <h1>Bike Details</h1>
+    <div class="container">
+        <div class="bike-details">
+            <h2 th:text="${bike.name}"></h2>
+            <div class="details-row">
+                <strong>Type:</strong> <span th:text="${bike.type}"></span>
+            </div>
+            <div class="details-row">
+                <strong>Price per hour:</strong> $<span th:text="${bike.pricePerHour}"></span>
+            </div>
+            <div class="details-row">
+                <strong>Status:</strong> 
+                <span th:if="${bike.available}" class="available">Available</span>
+                <span th:unless="${bike.available}" class="unavailable">Currently Rented</span>
+            </div>
+        </div>
+
+        <div class="actions" th:if="${bike.available}">
+            <a th:href="@{/bookings/rent/{bikeId}(bikeId=${bike.id})}" class="btn">Rent This Bike</a>
+            <a th:href="@{/bookings/request/{bikeId}(bikeId=${bike.id})}" class="btn">Request Delivery</a>
+        </div>
+
+        <div class="back-link">
+            <a th:href="@{/bikes}" class="btn">Back to Bikes</a>
+        </div>
+    </div>
+</body>
+</html>

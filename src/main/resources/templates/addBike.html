@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Bike - Bike Rental</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="/bikes" class="nav-link active">Manage Bikes</a>
+            <a href="/bookings/admin" class="nav-link">Manage Bookings</a>
+            <a href="/admin/users" class="nav-link">Manage Users</a>
+            <a href="/rideshares" class="nav-link">Ride Sharing</a>
+            <a href="/feedback" class="nav-link">Feedback</a>
+            <a href="/maintenance" class="nav-link">Maintenance</a>
+        </div>
+        <div class="nav-right">
+            <a href="/profile" class="nav-link">My Profile</a>
+            <a href="/logout" class="nav-link">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Add New Bike</h1>
+        <form th:action="@{/bikes/add}" method="post" th:object="${bike}">
+            <div class="form-group">
+                <label for="name">Bike Name:</label>
+                <input type="text" id="name" th:field="*{name}" required>
+            </div>
+            <div class="form-group">
+                <label for="type">Bike Type:</label>
+                <select id="type" th:field="*{type}" required>
+                    <option value="mountain">Mountain</option>
+                    <option value="road">Road</option>
+                    <option value="electric">Electric</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="pricePerHour">Price Per Hour ($):</label>
+                <input type="number" id="pricePerHour" th:field="*{pricePerHour}" step="0.01" min="0" required>
+            </div>
+            <button type="submit" class="btn">Add Bike</button>
+        </form>
+    </div>
+</body>
+</html>

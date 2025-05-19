@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Bikes - Bike Rental</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="/bikes" class="nav-link active">Request or Rent</a>
+            <a href="/bookings" class="nav-link">My Bookings</a>
+            <a href="/rideshares" class="nav-link">Ride Sharing</a>
+            <a href="/feedback" class="nav-link">Feedback</a>
+            <a th:if="${isAdmin}" href="/maintenance" class="nav-link">Maintenance</a>
+        </div>
+        <div class="nav-right">
+            <a href="/profile" class="nav-link">My Profile</a>
+            <a href="/logout" class="nav-link">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Available Bikes</h1>
+
+        <div th:if="${param.error}" class="alert alert-danger">
+            Sorry, this bike is no longer available.
+        </div>
+
+        <!-- Admin-only section for adding new bikes -->
+        <div th:if="${isAdmin}" class="admin-section">
+            <a href="/bikes/add" class="btn btn-primary">Add New Bike</a>
+        </div>
+
+        <!-- Bike listing -->
+        <div class="bike-list">
+            <div th:if="${#lists.isEmpty(bikes)}" class="no-bikes">
+                <p>No bikes available at the moment.</p>
+            </div>
+
+            <div th:each="bike : ${bikes}" class="bike-card">
+                <h3 th:text="${bike.name}">Bike Name</h3>
+                <div class="bike-details">
+                    <p><strong>Type:</strong> <span th:text="${bike.type}">Bike Type</span></p>
+                    <p><strong>Price:</strong> $<span th:text="${bike.pricePerHour}">0.00</span> per hour</p>
+                </div>
+                <div class="bike-actions">
+                    <a th:href="@{/bookings/rent/{id}(id=${bike.id})}" class="btn btn-success">Rent This Bike</a>
+                    <a th:href="@{/bookings/request/{id}(id=${bike.id})}" class="btn btn-info">Request Ride</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/bikes.js}"></script>
+    <footer>
+        <p>PGNO 25</p>
+    </footer>
+</body>
+</html>

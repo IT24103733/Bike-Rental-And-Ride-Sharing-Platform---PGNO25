@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome - Bike Rental</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+    <div class="welcome-container">
+        <h1 class="welcome-title">Welcome to Bike Rental System</h1>
+        <p class="welcome-subtitle">Rent a bike easily and explore the city at your own pace</p>
+
+        <div class="auth-buttons">
+            <a href="/login" class="auth-button">Sign In</a>
+            <a href="/login?showSignup=true" class="auth-button signup">Sign Up</a>
+        </div>
+
+        <div class="admin-info">
+            <p><strong>Admin Access:</strong></p>
+            <p>Username: admin</p>
+            <p>Password: admin123</p>
+        </div>
+    </div>
+</body>
+</html>

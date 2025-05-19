@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bike Maintenance History</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="/bikes" class="nav-link">Manage Bikes</a>
+            <a href="/bookings/admin" class="nav-link">Manage Bookings</a>
+            <a href="/admin/users" class="nav-link">Manage Users</a>
+            <a href="/rideshares" class="nav-link">Ride Sharing</a>
+            <a href="/feedback" class="nav-link">Feedback</a>
+            <a href="/maintenance" class="nav-link active">Maintenance</a>
+        </div>
+        <div class="nav-right">
+            <a href="/profile" class="nav-link">My Profile</a>
+            <a href="/logout" class="nav-link">Logout</a>
+        </div>
+    </nav>
+
+    <main>
+        <section class="maintenance-section">
+            <div class="bike-info">
+                <h2>Maintenance History for <span th:text="${bike.name}">Bike Name</span></h2>
+                <div class="bike-details">
+                    <p><strong>Type:</strong> <span th:text="${bike.type}">Bike Type</span></p>
+                    <p><strong>Price per Hour:</strong> $<span th:text="${bike.pricePerHour}">Price</span></p>
+                    <p><strong>Status:</strong> <span th:text="${bike.available ? 'Available' : 'Not Available'}">Status</span></p>
+                </div>
+                <a href="/maintenance" class="btn back-btn">Back to All Maintenance</a>
+            </div>
+
+            <div class="maintenance-form">
+                <h3>Add New Maintenance Record</h3>
+                <form th:action="@{/maintenance/add}" method="post" th:object="${newMaintenance}">
+                    <input type="hidden" name="bikeId" th:value="${bikeId}" />
+                    <div class="form-group">
+                        <label for="description">Maintenance Description:</label>
+                        <textarea id="description" name="description" th:field="*{description}" rows="4" required></textarea>
+                    </div>
+                    <button type="submit" class="btn">Add Record</button>
+                </form>
+            </div>
+
+            <div class="maintenance-list">
+                <h3>Maintenance History</h3>
+                <div th:if="${#lists.isEmpty(maintenanceRecords)}" class="no-maintenance">
+                    <p>No maintenance records found for this bike.</p>
+                </div>
+                <table class="maintenance-table" th:if="${!#lists.isEmpty(maintenanceRecords)}">
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th>Performed By</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="record : ${maintenanceRecords}" class="maintenance-item" th:data-id="${record.id}">
+                            <td class="description-cell" th:text="${record.description}">Maintenance description</td>
+                            <td th:text="${record.adminUsername}">Admin</td>
+                            <td th:text="${#temporals.format(record.maintenanceDate, 'dd-MM-yyyy HH:mm')}">Date</td>
+                            <td class="actions-cell">
+                                <button class="edit-btn">Edit</button>
+                                <button class="delete-btn">Delete</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="edit-modal" style="display: none;">
+                    <div class="modal-content">
+                        <span class="close-modal">&times;</span>
+                        <h3>Edit Maintenance Record</h3>
+                        <div class="form-group">
+                            <label for="editDescription">Description:</label>
+                            <textarea id="editDescription" rows="4" required></textarea>
+                        </div>
+                        <button id="saveEdit" class="btn">Save Changes</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>PGNO 25</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.querySelector('.edit-modal');
+            const closeModal = document.querySelector('.close-modal');
+            let currentRecordId = null;
+
+            // Edit maintenance record
+            document.querySelectorAll('.edit-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const row = this.closest('tr');
+                    currentRecordId = row.getAttribute('data-id');
+                    const description = row.querySelector('.description-cell').textContent;
+
+                    document.getElementById('editDescription').value = description;
+                    modal.style.display = 'block';
+                });
+            });
+
+            // Close modal
+            closeModal.addEventListener('click', function() {
+                modal.style.display = 'none';
+            });
+
+            // Close modal when clicking outside
+            window.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+
+            // Save edited maintenance record
+            document.getElementById('saveEdit').addEventListener('click', function() {
+                const description = document.getElementById('editDescription').value;
+
+                fetch('/maintenance/update', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        id: currentRecordId,
+                        description: description
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update the row in the table
+                        const row = document.querySelector(`tr[data-id="${currentRecordId}"]`);
+                        row.querySelector('.description-cell').textContent = description;
+                        modal.style.display = 'none';
+                    } else {
+                        alert('Failed to update maintenance record: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while updating the maintenance record');
+                });
+            });
+
+            // Delete maintenance record
+            document.querySelectorAll('.delete-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    if (confirm('Are you sure you want to delete this maintenance record?')) {
+                        const row = this.closest('tr');
+                        const recordId = row.getAttribute('data-id');
+
+                        fetch(`/maintenance/${recordId}`, {
+                            method: 'DELETE'
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                row.remove();
+                                if (document.querySelectorAll('.maintenance-item').length === 0) {
+                                    document.querySelector('.maintenance-table').style.display = 'none';
+                                    document.querySelector('.maintenance-list').innerHTML += '<div class="no-maintenance"><p>No maintenance records found for this bike.</p></div>';
+                                }
+                            } else {
+                                alert('Failed to delete maintenance record: ' + data.error);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('An error occurred while deleting the maintenance record');
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

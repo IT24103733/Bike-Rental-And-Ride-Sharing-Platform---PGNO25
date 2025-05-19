@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bookings - Bike Rental</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="/bikes" class="nav-link">Request or Rent</a>
+            <a href="/bookings" class="nav-link active">My Bookings</a>
+            <a href="/rideshares" class="nav-link">Ride Sharing</a>
+            <a href="/feedback" class="nav-link">Feedback</a>
+            <a th:if="${isAdmin}" href="/maintenance" class="nav-link">Maintenance</a>
+        </div>
+        <div class="nav-right">
+            <a href="/profile" class="nav-link">My Profile</a>
+            <a href="/logout" class="nav-link">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>My Bookings</h1>
+
+        <div th:if="${param.success}" class="alert alert-success">
+            Your booking was successful!
+        </div>
+
+        <!-- Booking listing -->
+        <div class="booking-list">
+            <div th:if="${#lists.isEmpty(bookings)}" class="no-bookings">
+                <p>You don't have any bookings yet.</p>
+                <a href="/bikes" class="btn btn-primary">Find a Bike</a>
+            </div>
+
+            <div th:each="booking : ${bookings}" class="booking-card">
+                <div class="booking-details">
+                    <p><strong>Booking ID:</strong> <span th:text="${booking.id}">0</span></p>
+                    <p><strong>Bike ID:</strong> <span th:text="${booking.bikeId}">0</span></p>
+                    <p><strong>Booking Time:</strong> <span th:text="${#temporals.format(booking.bookingTime, 'yyyy-MM-dd HH:mm')}">2023-01-01 12:00</span></p>
+                    <p th:if="${booking.rideRequest}">
+                        <strong>Type:</strong> Ride Request
+                        <br>
+                        <strong>Delivery Address:</strong> <span th:text="${booking.address}">Address</span>
+                    </p>
+                    <p th:unless="${booking.rideRequest}">
+                        <strong>Type:</strong> Bike Rental
+                        <br>
+                        <strong>Pickup Location:</strong> Head Office
+                    </p>
+                </div>
+                <div class="booking-actions">
+                    <a th:href="@{/bookings/update/{id}(id=${booking.id})}" class="btn btn-warning">Update</a>
+                    <a th:href="@{/bookings/cancel/{id}(id=${booking.id})}" class="btn btn-danger" 
+                       onclick="return confirm('Are you sure you want to cancel this booking?')">Cancel</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/bookings.js}"></script>
+    <footer>
+        <p>PGNO 25</p>
+    </footer>
+</body>
+</html>
