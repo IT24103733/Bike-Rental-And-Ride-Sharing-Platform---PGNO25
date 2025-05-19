@@ -1,12 +1,12 @@
 package com.example.pgno25oopgroupprojectfinalrelease.service;
 
-import com.example.oopprojectbeta.model.Bike;
-import com.example.oopprojectbeta.model.Booking;
-import com.example.oopprojectbeta.model.RideShare;
-import com.example.oopprojectbeta.repository.BikeRepo;
-import com.example.oopprojectbeta.repository.BookingRepo;
-import com.example.oopprojectbeta.repository.RideShareRepo;
-import com.example.oopprojectbeta.repository.UserRepo;
+import com.example.pgno25oopgroupprojectfinalrelease.model.Bike;
+import com.example.pgno25oopgroupprojectfinalrelease.model.Booking;
+import com.example.pgno25oopgroupprojectfinalrelease.model.RideShare;
+import com.example.pgno25oopgroupprojectfinalrelease.repository.BikeRepo;
+import com.example.pgno25oopgroupprojectfinalrelease.repository.BookingRepo;
+import com.example.pgno25oopgroupprojectfinalrelease.repository.RideShareRepo;
+import com.example.pgno25oopgroupprojectfinalrelease.repository.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
