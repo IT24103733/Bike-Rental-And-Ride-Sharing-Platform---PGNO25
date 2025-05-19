@@ -1,10 +1,10 @@
 package com.example.pgno25oopgroupprojectfinalrelease.service;
 
-import com.example.oopprojectbeta.model.Bike;
-import com.example.oopprojectbeta.model.Maintenance;
-import com.example.oopprojectbeta.model.User;
-import com.example.oopprojectbeta.repository.BikeRepo;
-import com.example.oopprojectbeta.repository.MaintenanceRepo;
+import com.example.pgno25oopgroupprojectfinalrelease.model.Bike;
+import com.example.pgno25oopgroupprojectfinalrelease.model.Maintenance;
+import com.example.pgno25oopgroupprojectfinalrelease.model.User;
+import com.example.pgno25oopgroupprojectfinalrelease.repository.BikeRepo;
+import com.example.pgno25oopgroupprojectfinalrelease.repository.MaintenanceRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -102,4 +102,3 @@ public class MaintenanceService {
         return maintenanceRepo.delete(maintenanceId);
     }
 }
-
