@@ -1,8 +1,8 @@
-package com.example.oopprojectbeta.service;
+package com.example.pgno25oopgroupprojectfinalrelease.service;
 
-import com.example.oopprojectbeta.model.Bike;
-import com.example.oopprojectbeta.repository.BikeRepo;
-import com.example.oopprojectbeta.utl.QuickSort;
+import com.example.pgno25oopgroupprojectfinalrelease.model.Bike;
+import com.example.pgno25oopgroupprojectfinalrelease.repository.BikeRepo;
+import com.example.pgno25oopgroupprojectfinalrelease.utl.QuickSort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
