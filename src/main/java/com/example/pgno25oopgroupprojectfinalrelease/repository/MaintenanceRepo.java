@@ -1,7 +1,7 @@
 package com.example.pgno25oopgroupprojectfinalrelease.repository;
 
-import com.example.oopprojectbeta.model.Maintenance;
-import com.example.oopprojectbeta.service.FileStorageService;
+import com.example.pgno25oopgroupprojectfinalrelease.model.Maintenance;
+import com.example.pgno25oopgroupprojectfinalrelease.service.FileStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
