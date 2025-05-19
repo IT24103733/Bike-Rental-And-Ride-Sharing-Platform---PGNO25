@@ -56,7 +56,7 @@ public class MaintenanceService {
         maintenance.setAdminId(admin.getId());
         maintenance.setAdminUsername(admin.getUsername());
 
-        // Set maintenance date if not provided
+        // Set maintenance date if not provided.
         if (maintenance.getMaintenanceDate() == null) {
             maintenance.setMaintenanceDate(LocalDateTime.now());
         }
